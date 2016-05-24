@@ -261,7 +261,7 @@ public class OneFragment extends Fragment  {
                 prvi = i;
                 prvi_postoji = true;
             }
-            if (data.get(i) > 0 && i > prvi)
+            if (data.get(i) > 0 && i >= prvi)
                 zadnji = i;
         }
 

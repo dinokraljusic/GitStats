@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
-    DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
+    //DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
     ViewPager mViewPager;
     String repo;
 
