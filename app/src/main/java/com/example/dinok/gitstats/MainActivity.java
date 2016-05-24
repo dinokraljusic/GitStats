@@ -5,16 +5,23 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -27,7 +34,7 @@ import java.util.List;
 //import android.support.v4.app.FragmentManager;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     private GithubApp mApp;
     private Repository repository;
     private Integer current;
@@ -36,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     public static CustomToolBar toolbar;
     public static TabLayout tabLayout;
     private ViewPagerNoSwipe viewPager;
+    private SwipeRefreshLayout swipeLayout;
 
     private OneFragment dayFragment;
     private OneFragment weekFragment;
@@ -55,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_settings:
                 //TODO add edit settings activity
                 mApp.resetAccessToken();
+                repository.delete();
                 Intent i = new Intent(this, LoginActivity.class);
                 startActivity(i);
                 return true;
@@ -83,16 +92,32 @@ public class MainActivity extends AppCompatActivity {
     ViewPager mViewPager;
     String repo;
 
+    public void getApiData(){
+        repository = mApp.getRepoData();
+        if (repository != null) {
+            mApp.getReadMe(repository);
+            mApp.getTotalData(repository);
+            mApp.getDayCommits(repository);
+            mApp.storeRepoId(repository.save());
+        }
+    }
+
     private class AsyncTaskRunner extends AsyncTask<String, Void, Repository> {
 
         @Override
         protected Repository doInBackground(String... params) {
-            repository = mApp.getRepoData();
-            if (repository != null) {
-                mApp.getReadMe(repository);
-                mApp.getTotalData(repository);
-                mApp.getDayCommits(repository);
+            if (mApp.getInternalRepoId() != null && mApp.getInternalRepoId() > 0) {
+                repository = Repository.findById(Repository.class, mApp.getInternalRepoId());
+                if (repository != null) {
+                    repository.setDayCommits(DayCommit.find(DayCommit.class, "REPO_ID = ?", mApp.getInternalRepoId().toString()));
+                    repository.setWeekCommits(WeekCommit.find(WeekCommit.class, "REPO_ID = ?", mApp.getInternalRepoId().toString()));
+                    repository.setMonthCommits(MonthCommit.find(MonthCommit.class, "REPO_ID = ?", mApp.getInternalRepoId().toString()));
+                    repository.regenerateLists();
+                }
             }
+
+            if (repository == null)
+                getApiData();
             return repository;
         }
 
@@ -134,9 +159,9 @@ public class MainActivity extends AppCompatActivity {
         bundle.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getDayCommits().get(1).getHours());
         bundle.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getDayCommits().get(2).getHours());//TODO: corres
 
-        bundle.putInt("day", repository.getDayCommits().get(0).getDate().getDay());
-        bundle.putInt("month", repository.getDayCommits().get(0).getDate().getMonth()+1);
-        bundle.putInt("type",0);
+        bundle.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
+        bundle.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        bundle.putInt("type", 0);
         dayFragment.setArguments(bundle);
 
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
@@ -159,9 +184,9 @@ public class MainActivity extends AppCompatActivity {
         bundle2.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getWeekCommits().get(1).getDays());
         bundle2.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getWeekCommits().get(2).getDays());//TODO: corres
 
-        bundle2.putInt("day", repository.getDayCommits().get(0).getDate().getDay());
-        bundle2.putInt("month", repository.getDayCommits().get(0).getDate().getMonth()+1);
-        bundle2.putInt("type",1);
+        bundle2.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
+        bundle2.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        bundle2.putInt("type", 1);
         weekFragment.setArguments(bundle2);
 
         android.support.v4.app.FragmentManager fragmentManager2 = getSupportFragmentManager();
@@ -184,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
         bundle3.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getMonthCommits().get(1).getDays());
         bundle3.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getMonthCommits().get(2).getDays());//TODO: corres
 
-        bundle3.putInt("day", repository.getDayCommits().get(0).getDate().getDay());
-        bundle3.putInt("month", repository.getDayCommits().get(0).getDate().getMonth()+1);
-        bundle3.putInt("type",2);
+        bundle3.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
+        bundle3.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        bundle3.putInt("type", 2);
         monthFragment.setArguments(bundle3);
 
         android.support.v4.app.FragmentManager fragmentManager3 = getSupportFragmentManager();
@@ -239,48 +264,27 @@ public class MainActivity extends AppCompatActivity {
         AsyncTaskRunner astr = new AsyncTaskRunner();
         astr.execute(" ");
 
-
-        // System.out.println(repository.getFullName());
-
-        //repo = getIntent().getStringExtra("repo");
-
-        // ViewPager and its adapters use support library
-        // fragments, so use getSupportFragmentManager.
-        //mDemoCollectionPagerAdapter = new DemoCollectionPagerAdapter(getSupportFragmentManager());
-        //mViewPager = (ViewPager) findViewById(R.id.pager);
-        // mViewPager.setAdapter(mDemoCollectionPagerAdapter);
-
-
-        /*final android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-
-        // Specify that tabs should be displayed in the action bar.
-        //if (actionBar != null) {
-            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        //}
-
-        // Create a tab listener that is called when the user changes tabs.
-        ActionBar.TabListener tabListener = new ActionBar.TabListener() {
-            @Override
-            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-            }
-
-            @Override
-            public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-            }
-
-            @Override
-            public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-            }
-
-        };
-
-
-        }*/
+        swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
+        swipeLayout.setOnRefreshListener(this);
+        swipeLayout.setDistanceToTriggerSync(100);
 
     }
+
+    @Override
+    public void onRefresh() {
+        swipeLayout.setRefreshing(true);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                repository.delete();
+                mApp.resetStoredRepoId();
+                AsyncTaskRunner astr = new AsyncTaskRunner();
+                astr.execute(" ");
+                swipeLayout.setRefreshing(false);
+            }
+        }, 4000);
+    }
+
 
     private void setupViewPager(ViewPagerNoSwipe viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());

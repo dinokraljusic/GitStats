@@ -263,7 +263,7 @@ public class GithubApp {
                 String sinceAsIso = df.format(calendar.getTime());
 
 
-                URL url = new URL(API_URL + "/repos/" + actualRepo + "/commits" + "?access_token=" + mAccessToken + "&since=" + sinceAsIso + "&until="+ nowAsISO);
+                URL url = new URL(API_URL + "/repos/" + actualRepo + "/commits" + "?access_token=" + mAccessToken + "&since=" + sinceAsIso + "&until=" + nowAsISO);
 
                 Log.d(TAG, "Opening URL " + url.toString());
                 HttpURLConnection urlConnection = (HttpURLConnection) url
@@ -347,6 +347,15 @@ public class GithubApp {
         }
     }
 
+    public void storeRepoId(Long id) {
+        mSession.storeRepoInternalId(id);
+    }
+
+    public Long getInternalRepoId() {
+        return mSession.getRepoInternalId();
+    }
+
+
     public String getRepo() {
         return mRepo;
     }
@@ -361,6 +370,10 @@ public class GithubApp {
 
     public void setRepository(Repository repository) {
         this.repository = repository;
+    }
+
+    public void resetStoredRepoId() {
+        mSession.resetStoredRepoId();
     }
 
     public interface OAuthAuthenticationListener {

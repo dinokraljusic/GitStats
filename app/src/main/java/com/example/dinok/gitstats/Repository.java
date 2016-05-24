@@ -1,5 +1,7 @@
 package com.example.dinok.gitstats;
 
+import com.orm.SugarRecord;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +17,7 @@ import java.util.TimeZone;
 /**
  * Created by dinok on 5/21/2016.
  */
-public class Repository {
+public class Repository extends SugarRecord {
     private String fullName;
     private String description;
     private String readme;
@@ -74,7 +76,7 @@ public class Repository {
         JSONArray days = (JSONArray) jsonObject.getJSONArray("days");
 
         calendar.setTime(date);
-        calendar.add(Calendar.DATE, dayOfWeek);
+        calendar.add(Calendar.DATE, dayOfWeek-1);
         createDayCommit(calendar, days, dayOfWeek);
         calendar.add(Calendar.DATE, -1);
         if (dayOfWeek > 1) {
@@ -99,7 +101,6 @@ public class Repository {
     public void createDayCommit(Calendar calendar, JSONArray days, int i) throws JSONException {
         DayCommit dayCommit = new DayCommit();
         dayCommit.setDate(calendar.getTime());
-        dayCommit.setTotal((Integer) days.get(i));
         getDayCommits().add(dayCommit);
     }
 
@@ -127,7 +128,7 @@ public class Repository {
             monthCommit.setTotal((jsonObject.getInt("total")));
             JSONArray days = (JSONArray) jsonObject.getJSONArray("days");
             for (int i = 0; i < days.length(); i++)
-                if (calendar.get(Calendar.DAY_OF_MONTH) + i<31)
+                if (calendar.get(Calendar.DAY_OF_MONTH) + i < 31)
                     monthCommit.getDays().set(calendar.get(Calendar.DAY_OF_MONTH) + i, days.getInt(i));
             monthCommits.add(monthCommit);
         } else {
@@ -140,7 +141,7 @@ public class Repository {
                     monthCommit.setTotal(monthCommit.getTotal() + (jsonObject.getInt("total")));
                     JSONArray days = (JSONArray) jsonObject.getJSONArray("days");
                     for (int i = 0; i < days.length(); i++)
-                        if (calendar.get(Calendar.DAY_OF_MONTH) + i<31)
+                        if (calendar.get(Calendar.DAY_OF_MONTH) + i < 31)
                             monthCommit.getDays().set(calendar.get(Calendar.DAY_OF_MONTH) + i, days.getInt(i));
                 }
             }
@@ -150,7 +151,7 @@ public class Repository {
                 monthCommit.setTotal((jsonObject.getInt("total")));
                 JSONArray days = (JSONArray) jsonObject.getJSONArray("days");
                 for (int i = 0; i < days.length(); i++)
-                    if (calendar.get(Calendar.DAY_OF_MONTH) + i<31)
+                    if (calendar.get(Calendar.DAY_OF_MONTH) + i < 31)
                         monthCommit.getDays().set(calendar.get(Calendar.DAY_OF_MONTH) + i, days.getInt(i));
                 monthCommits.add(monthCommit);
             } else if (!found && monthCommits.size() == 3)
@@ -178,7 +179,7 @@ public class Repository {
                 if (calendar.get(Calendar.DATE) == calendarCommit.get(Calendar.DATE)) {
                     Integer location = calendar.get(Calendar.HOUR_OF_DAY);
                     day.getHours().set(location, day.getHours().get(location) + 1);
-                    day.setTotal(day.getTotal()+1);
+                    day.setTotal(day.getTotal() + 1);
                     break;
                 }
             }
@@ -223,5 +224,63 @@ public class Repository {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    @Override
+    public long save() {
+        long id = super.save();
+        for (DayCommit dayCommit : dayCommits) {
+            dayCommit.setRepoId(id);
+            dayCommit.save();
+        }
+
+        for (WeekCommit weekCommit : weekCommits) {
+            weekCommit.setRepoId(id);
+            weekCommit.save();
+        }
+        for (MonthCommit monthCommit : monthCommits) {
+            monthCommit.setRepoId(id);
+            monthCommit.save();
+        }
+        return id;
+    }
+
+    public void regenerateLists() {
+        generateEmptyList();
+        for (DayCommit dayCommit : dayCommits)
+            dayCommit.generateListFromArray();
+        for (WeekCommit weekCommit : weekCommits)
+            weekCommit.generateListFromArray();
+        for (MonthCommit monthCommit : monthCommits)
+            monthCommit.generateListFromArray();
+    }
+
+    public void generateEmptyList() {
+        if (dayCommits == null || dayCommits.size() == 0) {
+            dayCommits = new ArrayList<DayCommit>();
+            for (int i = 0; i < 3; i++)
+                dayCommits.add(new DayCommit());
+        }
+        if (weekCommits == null || weekCommits.size() == 0) {
+            weekCommits = new ArrayList<WeekCommit>();
+            for (int i = 0; i < 3; i++)
+                weekCommits.add(new WeekCommit());
+        }
+        if (monthCommits == null || monthCommits.size() == 0) {
+            monthCommits = new ArrayList<MonthCommit>();
+            for (int i = 0; i < 3; i++)
+                monthCommits.add(new MonthCommit());
+        }
+    }
+
+    @Override
+    public boolean delete() {
+        for (DayCommit dayCommit : dayCommits)
+            dayCommit.delete();
+        for (WeekCommit weekCommit : weekCommits)
+            weekCommit.delete();
+        for (MonthCommit monthCommit : monthCommits)
+            monthCommit.delete();
+        return super.delete();
     }
 }
