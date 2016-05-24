@@ -146,9 +146,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         protected void onPostExecute(Repository repository) {
             super.onPostExecute(repository);
             flist = getVisibleFragments();
-            if(repository.getMonthCommits().size() <1){
+            boolean flag = false;
+            //int first = repository.getMonthCommits().get(0).getTotal();
+            for(int i = 1; i < repository.getMonthCommits().size(); i++)
+            {
+                if (repository.getMonthCommits().get(0).getTotal() > 0){
+                    flag = true;
+                    //break;
+                }
+
+            }
+            if (flag) System.out.println("ok");
+
+            if(!flag){
                 MainActivity.tries++;
-                if(MainActivity.tries > 20) return;
+                if(MainActivity.tries > 10) return;
                 AsyncTaskRunner astr = new AsyncTaskRunner();
                 astr.execute("");
                 return;
