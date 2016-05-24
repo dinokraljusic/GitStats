@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             public void run() {
                 repository.delete();
                 mApp.resetStoredRepoId();
+                repository=null;
                 AsyncTaskRunner astr = new AsyncTaskRunner();
                 astr.execute(" ");
                 swipeLayout.setRefreshing(false);
