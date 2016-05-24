@@ -43,6 +43,7 @@ public class OneFragment extends Fragment {
     int type, day, month;//0-day, 1-week, 2-month
     ProgressBar progressBar;
     View view;
+    TextView tvDate;
 
     /*public OneFragment() {
         // Required empty public constructor
@@ -116,6 +117,8 @@ public class OneFragment extends Fragment {
         double d = Double.parseDouble((totals.get(current)).toString())*100;
         Double p = d/max;
         progressBar.setProgress(p.intValue());
+
+        tvDate = (TextView) view.findViewById(R.id.date);
 
         if(type == 0){
             tvTotaltext.setText("Today total");
@@ -199,6 +202,7 @@ public class OneFragment extends Fragment {
         double d = Double.parseDouble((totals.get(current)).toString())*100;
         Double p = d/max;
         progressBar.setProgress(p.intValue());
+
         switch (type){
             case 0:
                 //progressBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.appblue), PorterDuff.Mode.DST_IN);
@@ -213,16 +217,28 @@ public class OneFragment extends Fragment {
                 progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.apporange)));
                 break;
         }
-
+        int da=day;
         switch (current){
             case 0:
                 drawGraph(data1);
+                String ma="";
+                ma = (month-1-current <= 0) ? getResources().getStringArray(R.array.months)[month-1-current +12 ] : getResources().getStringArray(R.array.months)[month-1-current];
+                ma+= " " + da;
+                tvDate.setText(ma);
                 break;
             case 1:
                 drawGraph(data2);
+                ma = (month-1-current <= 0) ? getResources().getStringArray(R.array.months)[month-1-current +12 ] : getResources().getStringArray(R.array.months)[month-1-current];
+                da-=1;
+                ma+= " " + da;
+                tvDate.setText(ma);
                 break;
             case 2:
                 drawGraph(data3);
+                ma = (month-1-current <= 0) ? getResources().getStringArray(R.array.months)[month-1-current +12 ] : getResources().getStringArray(R.array.months)[month-1-current];
+                da -= 2;
+                ma+= " " + da;
+                tvDate.setText(ma);
                 break;
         }
     }
