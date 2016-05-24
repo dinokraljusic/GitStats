@@ -29,6 +29,7 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 //import android.support.v4.app.FragmentManager;
@@ -48,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private OneFragment dayFragment;
     private OneFragment weekFragment;
     private OneFragment monthFragment;
+
+    private boolean refreshing = false;
+    public static int tries=0;
 
 
     @Override
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     ViewPager mViewPager;
     String repo;
 
-    public void getApiData(){
+    public void getApiData() {
         repository = mApp.getRepoData();
         if (repository != null) {
             mApp.getReadMe(repository);
@@ -121,27 +125,96 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             return repository;
         }
 
+        public List<Fragment> getVisibleFragments() {
+            List<Fragment> allFragments = getSupportFragmentManager().getFragments();
+            if (allFragments == null || allFragments.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            List<Fragment> visibleFragments = new ArrayList<Fragment>();
+            for (Fragment fragment : allFragments) {
+                if (fragment.isVisible()) {
+                    visibleFragments.add(fragment);
+                }
+            }
+            return visibleFragments;
+        }
+        public List<Fragment> flist;
+
+
         @Override
         protected void onPostExecute(Repository repository) {
             super.onPostExecute(repository);
+            flist = getVisibleFragments();
+            if(repository.getMonthCommits().size() <1){
+                MainActivity.tries++;
+                if(MainActivity.tries > 20) return;
+                AsyncTaskRunner astr = new AsyncTaskRunner();
+                astr.execute("");
+                return;
+            }
 
-            if (repository != null) {
+            if (repository != null /*&& !refreshing*/) {
 
                 // createFragment(dayFragment, (ArrayList<Integer>) repository.getDayCommits().get(current).getHours(), (repository.getDayCommits().get(current) != null ? repository.getDayCommits().get(current).getTotal() : 0));
                 // createFragment(weekFragment, (ArrayList<Integer>) repository.getWeekCommits().get(current).getDays(), (repository.getWeekCommits().get(current) != null ? repository.getWeekCommits().get(current).getTotal() : 0));
                 //createFragment(monthFragment, (ArrayList<Integer>) repository.getMonthCommits().get(current).getDays(), (repository.getMonthCommits().get(current) != null ? repository.getMonthCommits().get(current).getTotal() : 0));
 
-                createFragments();
+                //createFragments(repository);
 
                 viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);
+
+                if (refreshing) {
+                    resetViewPager(viewPager);
+                }
+                createFragments(repository);
                 setupViewPager(viewPager);
                 tabLayout.setupWithViewPager(viewPager);
+
+
+            } else if (refreshing && repository != null) {
+                dayFragment.setCurrent(0);
+                dayFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
+                List<Integer> totals = new ArrayList<Integer>();
+                for (DayCommit dayCommit : repository.getDayCommits())
+                    totals.add(dayCommit != null ? dayCommit.getTotal() : 0);
+                dayFragment.setTotals(totals);
+                dayFragment.setData1((ArrayList<Integer>) repository.getDayCommits().get(0).getHours());
+                dayFragment.setData2((ArrayList<Integer>) repository.getDayCommits().get(1).getHours());
+                dayFragment.setData3((ArrayList<Integer>) repository.getDayCommits().get(2).getHours());
+                dayFragment.refreshData();
+
+                weekFragment.setCurrent(0);
+                weekFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
+                List<Integer> totalsw = new ArrayList<Integer>();
+                for (WeekCommit weekCommit : repository.getWeekCommits())
+                    totalsw.add(weekCommit != null ? weekCommit.getTotal() : 0);
+                weekFragment.setTotals(totalsw);
+                weekFragment.setData1((ArrayList<Integer>) repository.getWeekCommits().get(0).getDays());
+                weekFragment.setData2((ArrayList<Integer>) repository.getWeekCommits().get(1).getDays());
+                weekFragment.setData3((ArrayList<Integer>) repository.getWeekCommits().get(2).getDays());
+                weekFragment.refreshData();
+
+                monthFragment.setCurrent(0);
+                monthFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
+                List<Integer> totalsm = new ArrayList<Integer>();
+                for (WeekCommit weekCommit : repository.getWeekCommits())
+                    totalsm.add(weekCommit != null ? weekCommit.getTotal() : 0);
+
+                monthFragment.setTotals(totalsm);
+
+                monthFragment.setData1((ArrayList<Integer>) repository.getMonthCommits().get(0).getDays());
+                monthFragment.setData1((ArrayList<Integer>) repository.getWeekCommits().get(1).getDays());
+                monthFragment.setData1((ArrayList<Integer>) repository.getWeekCommits().get(2).getDays());
+
+                monthFragment.refreshData();
             }
+            refreshing = false;
             //Toast.makeText(PersonList.this, pl.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
-    public void createFragments() {
+    public void createFragments(Repository repository) {
         dayFragment = new OneFragment();
         Bundle bundle = new Bundle();
         bundle.putString("full_name", repository.getFullName());
@@ -155,18 +228,30 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bundle.putString("readme", repository.getReadme());
 
 
-        bundle.putIntegerArrayList("data1", (ArrayList<Integer>) repository.getDayCommits().get(0).getHours());
-        bundle.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getDayCommits().get(1).getHours());
-        bundle.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getDayCommits().get(2).getHours());//TODO: corres
+        if (repository.getDayCommits().size() == 3) {
+            bundle.putIntegerArrayList("data1", (ArrayList<Integer>) repository.getDayCommits().get(0).getHours());
+            bundle.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getDayCommits().get(1).getHours());
+            bundle.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getDayCommits().get(2).getHours());//TODO: corres
+        } else {
+            bundle.putIntegerArrayList("data1", new ArrayList<Integer>());
+            bundle.putIntegerArrayList("data2", new ArrayList<Integer>());
+            bundle.putIntegerArrayList("data3", new ArrayList<Integer>());//T
+        }
 
-        bundle.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
-        bundle.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        if (repository.getDayCommits().size() == 3) {
+            bundle.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
+            bundle.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        } else {
+            bundle.putInt("day", 0);
+            bundle.putInt("month", 0);
+        }
         bundle.putInt("type", 0);
         dayFragment.setArguments(bundle);
 
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        /*android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.putFragment(bundle, "DAY", dayFragment);
         android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.commit();
+        fragmentTransaction.commit();*/
 
         weekFragment = new OneFragment();
         Bundle bundle2 = new Bundle();
@@ -180,18 +265,29 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bundle2.putIntegerArrayList("totals", (ArrayList<Integer>) totals);
         bundle2.putString("readme", repository.getReadme());
 
-        bundle2.putIntegerArrayList("data1", (ArrayList<Integer>) repository.getWeekCommits().get(0).getDays());
-        bundle2.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getWeekCommits().get(1).getDays());
-        bundle2.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getWeekCommits().get(2).getDays());//TODO: corres
+        if (repository.getWeekCommits().size() == 3) {
+            bundle2.putIntegerArrayList("data1", (ArrayList<Integer>) repository.getWeekCommits().get(0).getDays());
+            bundle2.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getWeekCommits().get(1).getDays());
+            bundle2.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getWeekCommits().get(2).getDays());
+        } else {
+            bundle.putIntegerArrayList("data1", new ArrayList<Integer>());
+            bundle.putIntegerArrayList("data2", new ArrayList<Integer>());
+            bundle.putIntegerArrayList("data3", new ArrayList<Integer>());//T
+        }//TODO: corres
 
-        bundle2.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
-        bundle2.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        if (repository.getWeekCommits().size() == 3) {
+            bundle2.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
+            bundle2.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        } else {
+            bundle2.putInt("day", 0);
+            bundle2.putInt("month", 0);
+        }
         bundle2.putInt("type", 1);
         weekFragment.setArguments(bundle2);
 
-        android.support.v4.app.FragmentManager fragmentManager2 = getSupportFragmentManager();
+       /* android.support.v4.app.FragmentManager fragmentManager2 = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-        fragmentTransaction2.commit();
+        fragmentTransaction2.commit();*/
 
         monthFragment = new OneFragment();
         Bundle bundle3 = new Bundle();
@@ -205,18 +301,29 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bundle3.putIntegerArrayList("totals", (ArrayList<Integer>) totals);
         bundle3.putString("readme", repository.getReadme());
 
-        bundle3.putIntegerArrayList("data1", (ArrayList<Integer>) repository.getMonthCommits().get(0).getDays());
-        bundle3.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getMonthCommits().get(1).getDays());
-        bundle3.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getMonthCommits().get(2).getDays());//TODO: corres
+        if (repository.getMonthCommits().size() == 3) {
+            bundle3.putIntegerArrayList("data1", (ArrayList<Integer>) repository.getMonthCommits().get(0).getDays());
+            bundle3.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getMonthCommits().get(1).getDays());
+            bundle3.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getMonthCommits().get(2).getDays());
+        } else {
+            bundle.putIntegerArrayList("data1", new ArrayList<Integer>());
+            bundle.putIntegerArrayList("data2", new ArrayList<Integer>());
+            bundle.putIntegerArrayList("data3", new ArrayList<Integer>());
+        }//TODO: corres//TODO: corres
 
-        bundle3.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
-        bundle3.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        if (repository.getMonthCommits().size() == 3) {
+            bundle3.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
+            bundle3.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+        } else {
+            bundle3.putInt("day",  0);
+            bundle3.putInt("month", 0);
+        }
         bundle3.putInt("type", 2);
         monthFragment.setArguments(bundle3);
 
-        android.support.v4.app.FragmentManager fragmentManager3 = getSupportFragmentManager();
+        /*android.support.v4.app.FragmentManager fragmentManager3 = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction fragmentTransaction3 = fragmentManager3.beginTransaction();
-        fragmentTransaction3.commit();
+        fragmentTransaction3.commit();*/
 
     }
 
@@ -278,21 +385,47 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             public void run() {
                 repository.delete();
                 mApp.resetStoredRepoId();
-                repository=null;
+                repository = null;
+                refreshing = true;
                 AsyncTaskRunner astr = new AsyncTaskRunner();
                 astr.execute(" ");
                 swipeLayout.setRefreshing(false);
             }
-        }, 4000);
+        }, 1000);
     }
 
 
     private void setupViewPager(ViewPagerNoSwipe viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
         adapter.addFragment(dayFragment, "DAY");
         adapter.addFragment(weekFragment, "WEEK");
-        adapter.addFragment(monthFragment, "Month");
+        adapter.addFragment(monthFragment, "MONTH");
         viewPager.setAdapter(adapter);
+
+        //viewPager.scro
+    }
+
+    private void resetViewPager(ViewPagerNoSwipe viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        //getSupportFragmentManager().getFragments().removeAll(getSupportFragmentManager().getFragments());
+
+      /*  if(dayFragment != null)
+            getSupportFragmentManager().beginTransaction().remove(dayFragment).commit();
+        if(monthFragment != null)
+            getSupportFragmentManager().beginTransaction().remove(monthFragment).commit();
+        if(monthFragment != null)
+            getSupportFragmentManager().beginTransaction().remove(monthFragment).commit();*/
+
+        viewPager.removeAllViews();
+        adapter.removeFragment(dayFragment, "DAY");
+        adapter.removeFragment(weekFragment, "WEEK");
+        adapter.removeFragment(monthFragment, "MONTH");
+        viewPager.setAdapter(adapter);
+        dayFragment = null;
+        monthFragment = null;
+        weekFragment = null;
+
         //viewPager.scro
     }
 
@@ -317,6 +450,13 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         public void addFragment(Fragment fragment, String title) {
             mFragmentList.add(fragment);
             mFragmentTitleList.add(title);
+            getSupportFragmentManager().beginTransaction().attach(fragment).commit();
+        }
+
+        public void removeFragment(Fragment fragment, String title) {
+            mFragmentList.remove(fragment);
+            mFragmentTitleList.remove(title);
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
         }
 
         @Override
