@@ -1,6 +1,7 @@
 package com.example.dinok.gitstats;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,11 +10,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private Integer current;
 
     //*****/
-    public static Toolbar toolbar;
+    public static CustomToolBar toolbar;
     public static TabLayout tabLayout;
     private ViewPagerNoSwipe viewPager;
 
@@ -55,6 +62,19 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private TextView getActionBarTextView() {
+        TextView titleTextView = null;
+
+        try {
+            Field f = getSupportActionBar().getClass().getDeclaredField("mTitleTextView");
+            f.setAccessible(true);
+            titleTextView = (TextView) f.get(getSupportActionBar());
+        } catch (NoSuchFieldException e) {
+        } catch (IllegalAccessException e) {
+        }
+        return titleTextView;
     }
 
     // When requested, this adapter returns a DemoObjectFragment,
@@ -191,16 +211,26 @@ public class MainActivity extends AppCompatActivity {
 
 
         //****http://www.androidhive.info/2015/09/android-material-design-working-with-tabs/*/
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (CustomToolBar) findViewById(R.id.toolbar);
+        /*TextView tvTitle = findViewById(R.id.action_ba)
+        ViewPager.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.)
+        tvTitle.setLayoutParams();*/
+
+
         toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appblue)));//boja appbara
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);//ukidamo back button
+        //getSupportActionBar().setCustomView(R.layout.actionbar);
 
+        //getActionBarTextView().setText("AADSF");
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);//
         //tabLayout.getTabAt(0).setCustomView(R.layout.tab_layout);
+
+        tabLayout.setTabTextColors(Color.LTGRAY, Color.parseColor("#007aff"));
+        tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#007aff"));
 
 /***/
         //viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);

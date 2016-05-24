@@ -192,7 +192,6 @@ public class OneFragment extends Fragment {
 
         return view;
 
-
     }
 
     public void refreshData(){
@@ -246,10 +245,45 @@ public class OneFragment extends Fragment {
     public void drawGraph(ArrayList<Integer> data){
         List<PointValue> values = new ArrayList<PointValue>();
         // List<Float> valuesY = new ArrayList<Float>();
+        Axis axisX = new Axis();
+
+        int prvi = -1, zadnji=data.size()-1;
+        boolean prvi_postoji=false;
+        for(int i=0; i<data.size(); i++){
+            if(data.get(i) > 0 && !prvi_postoji){
+                prvi=i;
+                prvi_postoji=true;
+            }
+            if(data.get(i) > 0 && i > prvi)
+                zadnji = i;
+        }
+
+        if(prvi > 0){
+            values.add(new PointValue(0, 0));
+            values.add(new PointValue(prvi-1, 0));
+        }
+
+
+       /* if(type == 0)
+             axisX = Axis.generateAxisFromRange(0, 23, 1);
+        else if(type == 1)
+            axisX = Axis.generateAxisFromRange(0, 6, 1);
+        else if(type == 2)
+            axisX = Axis.generateAxisFromRange(0, 30, 1);*/
 
         for (int i = 0; i < data.size(); i++) {
-            // if (data.get(i) != 0)
-            values.add(new PointValue(i, data.get(i)));
+            /*if (i>0 && data.get(i-1) == 0 && data.get(i)==0 && i<data.size()-1)
+                i++;
+            else*/
+            if(data.get(i) > 0 ) values.add(new PointValue(i, data.get(i)));
+        }
+
+        /**
+         dodavanje redoslijedom:
+         */
+        if(zadnji < data.size()-1){
+            values.add(new PointValue(zadnji+1, 0));
+            values.add(new PointValue(data.size()-1, 0));
         }
 
         chart.setInteractive(false);
@@ -268,7 +302,7 @@ public class OneFragment extends Fragment {
         LineChartData lineChartData = new LineChartData();
         lineChartData.setLines(lines);
         lineChartData.setBaseValue(Float.NEGATIVE_INFINITY);
-        Axis axisX = new Axis();
+        //Axis axisX = new Axis();
         Axis axisY = new Axis().setHasLines(true);
         // Axis axisX = Axis.generateAxisFromRange(0, data.size(), 1);
         //Axis axisY = Axis.generateAxisFromCollection(valuesY).setHasLines(true);
