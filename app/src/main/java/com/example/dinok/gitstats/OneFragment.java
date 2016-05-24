@@ -235,35 +235,9 @@ public class OneFragment extends Fragment {
             // if (data.get(i) != 0)
             values.add(new PointValue(i, data.get(i)));
         }
-        // values.add(new PointValue(data.size()+1, 0));
-
-        /*boolean found = false;
-        for (int i = data.size() - 1; i > 0; i--) {
-            if (data.get(i) != 0 && !found) {
-                values.add(new PointValue(i + 1, 0));
-                found = true;
-            }
-        }*/
-        // values.add(new PointValue(data.size()+1, 0));
-
-      /*  for (int i = 0; i <= todayTotal + 1; i++) {
-            Float f = new Float(i);
-            valuesY.add(f);
-        }*/
 
         chart.setInteractive(false);
-        //chart.getAxesRenderer().
 
-        //chart.setZoomType(ZoomType zoomType);
-        //chart.setContainerScrollEnabled(boolean isEnabled, ContainerScrollType type);
-
-        //List<PointValue> values = new ArrayList<PointValue>();
-        //values.add(new PointValue(0, 2));
-        //values.add(new PointValue(1, 4));
-        //values.add(new PointValue(2, 3));
-        //values.add(new PointValue(3, 4));
-
-        //In most cased you can call data model methods in builder-pattern-like manner.
         String color="";
         if(type==0)
             color="#007aff";
@@ -288,8 +262,12 @@ public class OneFragment extends Fragment {
             axisX.setName("Hours");
         if(type == 1)
             axisX.setName("Days");
-        if(type == 2)
-            axisX.setName("Days");
+        if(type == 2){
+            String m="";
+            m = (month-1-current <= 0) ? getResources().getStringArray(R.array.months)[month-1-current +12 ] : getResources().getStringArray(R.array.months)[month-1-current];
+            axisX.setName(m);
+        }
+
         //axisY.setName("Axis Y");
         // }
         lineChartData.setAxisXBottom(axisX);

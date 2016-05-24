@@ -72,9 +72,9 @@ public class Repository {
         Calendar calendarNow = Calendar.getInstance();
         int dayOfWeek = calendarNow.get(Calendar.DAY_OF_WEEK);
         JSONArray days = (JSONArray) jsonObject.getJSONArray("days");
+
         calendar.setTime(date);
-
-
+        calendar.add(Calendar.DATE, dayOfWeek);
         createDayCommit(calendar, days, dayOfWeek);
         calendar.add(Calendar.DATE, -1);
         if (dayOfWeek > 1) {
@@ -84,7 +84,7 @@ public class Repository {
                 createDayCommit(calendar, days, dayOfWeek - 2);
             } else {
                 JSONObject jsonObject2 = jsonArray.getJSONObject(jsonArray.length() - 2);
-                JSONArray days2 = (JSONArray) jsonObject.getJSONArray("days");
+                JSONArray days2 = (JSONArray) jsonObject2.getJSONArray("days");
                 createDayCommit(calendar, days2, 6);
             }
         } else {
