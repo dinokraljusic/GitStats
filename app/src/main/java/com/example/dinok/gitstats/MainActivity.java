@@ -305,9 +305,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         @Override
         public Fragment getItem(int position) {
-           /* if(position == 0) toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appblue)));
-            if(position == 1) toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appgreen)));
-            if(position == 1) toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.apporange)));*/
             return mFragmentList.get(position);
         }
 
