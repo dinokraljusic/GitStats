@@ -152,7 +152,6 @@ public class OneFragment extends Fragment  {
         progressBar.setProgress(p.intValue());
 
         tvDate = (TextView) view.findViewById(R.id.date);
-        //tvDate.setText(day + " " + getResources().getStringArray(R.array.months)[month]);
         setDate();
 
         if (type == 0) {
@@ -162,14 +161,10 @@ public class OneFragment extends Fragment  {
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.appblue)));
         } else if (type == 1) {
             tvTotaltext.setText("Week total");
-            //progressBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.DST_IN);
-            //MainActivity.toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appgreen)));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.appgreen)));
 
         } else if (type == 2) {
             tvTotaltext.setText("Month total");
-            //progressBar.getProgressDrawable().setColorFilter(Color.YELLOW, PorterDuff.Mode.DST_IN);
-            // MainActivity.toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.apporange)));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.apporange)));
         }
 
@@ -198,14 +193,12 @@ public class OneFragment extends Fragment  {
                     if (e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                         if (getCurrent() == 0) setCurrent(2);
                         else setCurrent(getCurrent() - 1);
-                        //tvTodayTotal.setText(totals!=null ? totals.get(current).toString() : "0");
                         refreshData();
                         Log.i("SWIPE", "Right to Left");
                     } else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                         Log.i("SWIPE", "Left to Right");
                         if (getCurrent() == 2) setCurrent(0);
                         else setCurrent(getCurrent() + 1);
-                        //tvTodayTotal.setText(totals!=null ? totals.get(current).toString() : "0");
                         refreshData();
                     }
                 } catch (Exception e) {
@@ -265,11 +258,9 @@ public class OneFragment extends Fragment  {
 
         switch (type) {
             case 0:
-                //progressBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.appblue), PorterDuff.Mode.DST_IN);
                 progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.appblue)));
                 break;
             case 1:
-                //progressBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.appgreen), PorterDuff.Mode.DST_IN);
                 progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.appgreen)));
                 break;
             case 2:
@@ -330,10 +321,6 @@ public class OneFragment extends Fragment  {
         }
 
         chart.setInteractive(false);
-        //chart.setValueSelectionEnabled(true);
-        //chart.setOnValueTouchListener(new ValueTouchListener());
-
-
 
         String color = "";
         if (type == 0)
@@ -344,9 +331,6 @@ public class OneFragment extends Fragment  {
             color = "#FFCC33";
         Line line = new Line(values).setColor(Color.parseColor(color)).setCubic(false).setFilled(true).setAreaTransparency(15);//.setHasLabels(true);//Color.BLUE
 
-        /*if(type == 1){
-            line.setHasLabels(true).setCubic(true);
-        }*/
         List<Line> lines = new ArrayList<Line>();
         lines.add(line);
 
@@ -357,7 +341,6 @@ public class OneFragment extends Fragment  {
         Axis axisY = new Axis().setHasLines(true);
         // Axis axisX = Axis.generateAxisFromRange(0, data.size(), 1);
         //Axis axisY = Axis.generateAxisFromCollection(valuesY).setHasLines(true);
-
         //if (hasAxesNames) {
         if (type == 0)
             axisX.setName("Hours");

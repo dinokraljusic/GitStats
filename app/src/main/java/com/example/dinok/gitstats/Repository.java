@@ -41,7 +41,8 @@ public class Repository extends SugarRecord {
     }
 
     public String getDescription() {
-        return description;
+        if(description != null) return description;
+        return "";
     }
 
     public void setDescription(String description) {

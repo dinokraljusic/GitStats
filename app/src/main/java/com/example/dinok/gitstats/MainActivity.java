@@ -7,34 +7,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import android.content.pm.ActivityInfo;
-import android.widget.Toast;
 
 //import android.support.v4.app.FragmentManager;
 
@@ -114,22 +97,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 getApiData();
             return repository;
         }
-
-       /* public List<Fragment> getVisibleFragments() {
-            List<Fragment> allFragments = getSupportFragmentManager().getFragments();
-            if (allFragments == null || allFragments.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            List<Fragment> visibleFragments = new ArrayList<Fragment>();
-            for (Fragment fragment : allFragments) {
-                if (fragment.isVisible()) {
-                    visibleFragments.add(fragment);
-                }
-            }
-            return visibleFragments;
-        }
-        public List<Fragment> flist;*/
 
 
         @Override
