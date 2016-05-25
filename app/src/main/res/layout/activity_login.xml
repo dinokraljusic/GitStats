@@ -60,7 +60,6 @@
             android:layout_marginTop="10dp"
             android:textSize="16sp"
             android:paddingStart="16dp"
-            android:text="https://github.com/torvalds/linux"
             android:paddingEnd="16dp"
             android:layout_height="35dp"/>
 
