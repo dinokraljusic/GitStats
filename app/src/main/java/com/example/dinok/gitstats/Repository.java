@@ -187,7 +187,8 @@ public class Repository extends SugarRecord {
     }
 
     public String getReadme() {
-        return readme;
+        if(readme != null)return readme;
+        else return "";
     }
 
     public void setReadme(String readme) {
