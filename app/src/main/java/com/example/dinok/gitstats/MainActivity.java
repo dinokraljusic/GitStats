@@ -1,6 +1,7 @@
 package com.example.dinok.gitstats;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -31,6 +32,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import android.content.pm.ActivityInfo;
 
 //import android.support.v4.app.FragmentManager;
 
@@ -160,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             if(!flag){
                 MainActivity.tries++;
+                System.out.println("TRIES: " + tries);
                 if(MainActivity.tries > 10) return;
                 AsyncTaskRunner astr = new AsyncTaskRunner();
                 astr.execute("");
@@ -348,6 +351,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         // actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appgreen)));
         //  actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         //   actionBar.setCustomView(R.layout.actionbar);
+
+        if(getResources().getBoolean(R.bool.portrait_only)){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
 
         mApp = new GithubApp(this, Constants.CLIENT_ID, Constants.CLIENT_SECRET, Constants.CALLBACK_URL);
 

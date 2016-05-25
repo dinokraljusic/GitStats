@@ -17,6 +17,15 @@
         <item>November</item>
         <item>December</item>
     </string-array>
+    <string-array name="day_of_week">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
     <string name="lorem">Lorem ipsum dolor sit amet, consectetuer
 adipiscing elit, sed diam nonummy nibh euismod
 tincidunt ut laoreet dolore magna aliquam erat

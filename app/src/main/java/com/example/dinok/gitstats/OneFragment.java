@@ -4,6 +4,7 @@ package com.example.dinok.gitstats;
  * Created by dinok on 5/23/2016.
  */
 
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -18,11 +19,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
@@ -46,6 +49,30 @@ public class OneFragment extends Fragment  {
     TextView tvDate;
     TextView tvDescription;
     TextView tvReadme;
+
+    private class ValueTouchListener implements LineChartOnValueSelectListener {
+
+        @Override
+        public void onValueSelected(int lineIndex, int pointIndex, PointValue value) {
+            String toastString = "";
+            if(type == 0 && !(Math.round(value.getY()) == 0)){
+                toastString = Math.round(value.getX()) +"h: "+ Math.round(value.getY()) + " commits";
+            }
+            if(type == 1 && !(Math.round(value.getY()) == 0)){
+                toastString = getResources().getStringArray(R.array.day_of_week)[Math.round(value.getX())] +": "+ Math.round(value.getY()) + " commits";
+            }
+            if(type == 2 && !(Math.round(value.getY()) == 0))
+                toastString = Math.round(value.getX()) +  ": " + Math.round(value.getY()) + " commits";
+            Toast.makeText(getActivity(), toastString, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onValueDeselected() {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
 
     /*public OneFragment() {
         // Required empty public constructor
@@ -294,6 +321,10 @@ public class OneFragment extends Fragment  {
         }
 
         chart.setInteractive(false);
+        //chart.setValueSelectionEnabled(true);
+        //chart.setOnValueTouchListener(new ValueTouchListener());
+
+
 
         String color = "";
         if (type == 0)
@@ -303,6 +334,10 @@ public class OneFragment extends Fragment  {
         if (type == 2)
             color = "#FFCC33";
         Line line = new Line(values).setColor(Color.parseColor(color)).setCubic(false).setFilled(true).setAreaTransparency(15);//.setHasLabels(true);//Color.BLUE
+
+        /*if(type == 1){
+            line.setHasLabels(true).setCubic(true);
+        }*/
         List<Line> lines = new ArrayList<Line>();
         lines.add(line);
 
