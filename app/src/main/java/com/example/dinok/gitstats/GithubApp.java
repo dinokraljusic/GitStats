@@ -250,7 +250,11 @@ public class GithubApp {
         String repoUrl = mSession.getRepo();
         if (repoUrl != null && !repoUrl.equals("")) {
             try {
-                String actualRepo = repoUrl.substring(repoUrl.indexOf("com/") + 4);
+                String actualRepo ="";
+                if (repoUrl.contains("com/"))
+                    actualRepo = repoUrl.substring(repoUrl.indexOf("com/") + 4);
+                else
+                    actualRepo = repoUrl;
 
                 TimeZone tz = TimeZone.getTimeZone("UTC");
                 DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");

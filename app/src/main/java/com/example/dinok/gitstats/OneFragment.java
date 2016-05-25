@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -122,9 +123,13 @@ public class OneFragment extends Fragment  {
         String readme = this.getArguments().getString("readme");
 
         type = this.getArguments().getInt("type");
-        day = this.getArguments().getInt("day");
-        month = this.getArguments().getInt("month");
+        long date = this.getArguments().getLong("date");
 
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(date);
+
+        day = calendar.get(Calendar.DATE);
+        month = calendar.get(Calendar.MONTH);
 
         view = inflater.inflate(R.layout.fragment_one, container, false);
         TextView tvFullName = (TextView) view.findViewById(R.id.full_name);
@@ -133,7 +138,7 @@ public class OneFragment extends Fragment  {
         tvDescription = (TextView) view.findViewById(R.id.description);
         tvDescription.setText(description);
         tvTodayTotal = (TextView) view.findViewById(R.id.today_total);
-        tvTodayTotal.setText(getTotals() != null && getTotals().size()>0 && getTotals().get(getCurrent())!=null ? getTotals().get(getCurrent()).toString() : "0");
+        tvTodayTotal.setText(getTotals() != null && getTotals().size() > 0 && getTotals().get(getCurrent()) != null ? getTotals().get(getCurrent()).toString() : "0");
         tvReadme = (TextView) view.findViewById(R.id.readme);
         tvReadme.setText(readme);
 
@@ -142,11 +147,13 @@ public class OneFragment extends Fragment  {
         //int max = Math.max(totals.get(0), totals.get(1));
         //if(max < )
         int max = Collections.max(getTotals());
-        double d = Double.parseDouble(getTotals() != null && getTotals().size()>0 && getTotals().get(getCurrent())!=null ? getTotals().get(getCurrent()).toString() : "0") * 100;
+        double d = Double.parseDouble(getTotals() != null && getTotals().size() > 0 && getTotals().get(getCurrent()) != null ? getTotals().get(getCurrent()).toString() : "0") * 100;
         Double p = d / max;
         progressBar.setProgress(p.intValue());
 
         tvDate = (TextView) view.findViewById(R.id.date);
+        //tvDate.setText(day + " " + getResources().getStringArray(R.array.months)[month]);
+        setDate();
 
         if (type == 0) {
             tvTotaltext.setText("Today total");
@@ -165,7 +172,6 @@ public class OneFragment extends Fragment  {
             // MainActivity.toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.apporange)));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.apporange)));
         }
-
 
         setData1(new ArrayList<Integer>(getArguments().getIntegerArrayList("data1")));
         setData2(new ArrayList<Integer>(getArguments().getIntegerArrayList("data2")));
@@ -220,6 +226,27 @@ public class OneFragment extends Fragment  {
 
     }
 
+    public void setDate() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DATE, day);
+        calendar.set(Calendar.MONTH, month);
+        switch (type) {
+            case 0:
+                calendar.add(Calendar.DATE, -getCurrent());
+                tvDate.setText(calendar.get(Calendar.DATE) + " " + getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)]);
+                break;
+            case 1:
+                calendar.add(Calendar.DATE, -getCurrent() * 7);
+                tvDate.setText(calendar.get(Calendar.DATE) + " " + getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)]);
+                break;
+            case 2:
+                calendar.add(Calendar.MONTH, -getCurrent());
+                tvDate.setText(/*alendar.get(Calendar.DATE) + " " +*/getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)] + " "+ calendar.get(Calendar.YEAR));
+                break;
+        }
+    }
+
+
     public void refreshFromApi(String description, String readme) {
         if (tvDescription != null)
             tvDescription.setText(description);
@@ -250,28 +277,18 @@ public class OneFragment extends Fragment  {
                 progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.apporange)));
                 break;
         }
-        int da = day;
         switch (getCurrent()) {
             case 0:
                 drawGraph(getData1());
-                String ma = "";
-                ma = (month - 1 - getCurrent() <= 0) ? getResources().getStringArray(R.array.months)[month - 1 - getCurrent() + 12] : getResources().getStringArray(R.array.months)[month - 1 - getCurrent()];
-                ma += " " + da;
-                tvDate.setText(ma);
+                setDate();
                 break;
             case 1:
                 drawGraph(getData2());
-                ma = (month - 1 - getCurrent() <= 0) ? getResources().getStringArray(R.array.months)[month - 1 - getCurrent() + 12] : getResources().getStringArray(R.array.months)[month - 1 - getCurrent()];
-                da -= 1;
-                ma += " " + da;
-                tvDate.setText(ma);
+                setDate();
                 break;
             case 2:
                 drawGraph(getData3());
-                ma = (month - 1 - getCurrent() <= 0) ? getResources().getStringArray(R.array.months)[month - 1 - getCurrent() + 12] : getResources().getStringArray(R.array.months)[month - 1 - getCurrent()];
-                da -= 2;
-                ma += " " + da;
-                tvDate.setText(ma);
+                setDate();
                 break;
         }
     }

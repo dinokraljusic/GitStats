@@ -36,6 +36,7 @@
             android:layout_height="0dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:maxHeight="25dp"
             android:layout_weight="1"/>
 
         <EditText

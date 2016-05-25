@@ -2,14 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="35dp"
     android:weightSum="2">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginRight="10dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:weightSum="10">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,14 +25,16 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:id="@+id/date"
+                    android:textSize="20sp"
                     android:gravity="left|center_vertical"
                     android:text="March 25th"
-                    android:layout_height="25dp" />
+                    android:layout_marginBottom="20dp"
+                    android:layout_height="wrap_content" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:textColor="#747164"
+                    android:textColor="@android:color/darker_gray"
                     android:textSize="12sp"
                     android:id="@+id/total_text"
                     android:text="Today total"
@@ -39,7 +42,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    android:textSize="20sp"
+                    android:textSize="22sp"
                     android:id="@+id/today_total"
                     android:layout_weight="3"/>
                 <!--<TextView
@@ -51,7 +54,7 @@
                     android:layout_width="90dp"
                     style="@android:style/Widget.ProgressBar.Horizontal"
                     android:layout_marginRight="50dp"
-                    android:layout_height="3dp"
+                    android:layout_height="5dp"
                     android:max="100"
                     android:id="@+id/progress"
                     android:progress="70"
@@ -60,21 +63,23 @@
                     android:indeterminate="false"
                     android:foregroundTintMode="src_atop" />
 
-            </LinearLayout>-
+            </LinearLayout>
         </LinearLayout>
 
 
 
         <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:id="@+id/container"
-            >
+            android:layout_marginTop="30dp"
+            android:layout_weight="8"
+            android:layout_height="0dp"
+            android:id="@+id/container">
+
             <lecho.lib.hellocharts.view.LineChartView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
         </FrameLayout>
 
     </LinearLayout>
@@ -89,6 +94,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"
             android:orientation="vertical"
+            android:layout_marginLeft="10dp"
             android:layout_weight="1">
 
             <TextView

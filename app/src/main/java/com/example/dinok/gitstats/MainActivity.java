@@ -158,7 +158,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 }
 
             }
-            if (flag) System.out.println("ok");
+            if (flag){
+                System.out.println("ok");
+                tries=0;
+            }
 
             if(!flag){
                 MainActivity.tries++;
@@ -242,11 +245,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         bundle.putIntegerArrayList("totals", (ArrayList<Integer>) totals);
         bundle.putString("readme", repository.getReadme());
 
-
         if (repository.getDayCommits().size() == 3) {
             bundle.putIntegerArrayList("data1", (ArrayList<Integer>) repository.getDayCommits().get(0).getHours());
             bundle.putIntegerArrayList("data2", (ArrayList<Integer>) repository.getDayCommits().get(1).getHours());
-            bundle.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getDayCommits().get(2).getHours());//TODO: corres
+            bundle.putIntegerArrayList("data3", (ArrayList<Integer>) repository.getDayCommits().get(2).getHours());
         } else {
             bundle.putIntegerArrayList("data1", new ArrayList<Integer>());
             bundle.putIntegerArrayList("data2", new ArrayList<Integer>());
@@ -254,19 +256,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
 
         if (repository.getDayCommits().size() == 3) {
-            bundle.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
-            bundle.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+            bundle.putLong("date", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getTime() : 0);
         } else {
-            bundle.putInt("day", 0);
-            bundle.putInt("month", 0);
+            bundle.putLong("date",  0);
         }
         bundle.putInt("type", 0);
         dayFragment.setArguments(bundle);
-
-        /*android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.putFragment(bundle, "DAY", dayFragment);
-        android.support.v4.app.FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.commit();*/
 
         weekFragment = new OneFragment();
         Bundle bundle2 = new Bundle();
@@ -288,21 +283,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             bundle.putIntegerArrayList("data1", new ArrayList<Integer>());
             bundle.putIntegerArrayList("data2", new ArrayList<Integer>());
             bundle.putIntegerArrayList("data3", new ArrayList<Integer>());//T
-        }//TODO: corres
-
+        }
         if (repository.getWeekCommits().size() == 3) {
-            bundle2.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
-            bundle2.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+            bundle2.putLong("date", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getTime() : 0);
         } else {
-            bundle2.putInt("day", 0);
-            bundle2.putInt("month", 0);
+            bundle2.putLong("date", 0);
         }
         bundle2.putInt("type", 1);
         weekFragment.setArguments(bundle2);
-
-       /* android.support.v4.app.FragmentManager fragmentManager2 = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction fragmentTransaction2 = fragmentManager2.beginTransaction();
-        fragmentTransaction2.commit();*/
 
         monthFragment = new OneFragment();
         Bundle bundle3 = new Bundle();
@@ -324,23 +312,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             bundle.putIntegerArrayList("data1", new ArrayList<Integer>());
             bundle.putIntegerArrayList("data2", new ArrayList<Integer>());
             bundle.putIntegerArrayList("data3", new ArrayList<Integer>());
-        }//TODO: corres//TODO: corres
+        }
 
         if (repository.getMonthCommits().size() == 3) {
-            bundle3.putInt("day", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getDay() : 0);
-            bundle3.putInt("month", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getMonth() + 1 : 0);
+            bundle3.putLong("date", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getTime() : 0);
         } else {
-            bundle3.putInt("day",  0);
-            bundle3.putInt("month", 0);
+            bundle3.putInt("date", 0);
         }
         bundle3.putInt("type", 2);
         monthFragment.setArguments(bundle3);
 
-        /*android.support.v4.app.FragmentManager fragmentManager3 = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction fragmentTransaction3 = fragmentManager3.beginTransaction();
-        fragmentTransaction3.commit();*/
-
     }
+
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
