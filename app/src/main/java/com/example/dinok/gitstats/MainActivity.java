@@ -32,6 +32,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import android.content.pm.ActivityInfo;
 import android.widget.Toast;
 
@@ -54,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private OneFragment monthFragment;
 
     private boolean refreshing = false;
-    public static int tries=0;
+    public static int tries = 0;
 
 
     @Override
@@ -70,7 +71,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             case R.id.action_settings:
                 //TODO add edit settings activity
                 mApp.resetAccessToken();
-                repository.delete();
+                if (repository != null)
+                    repository.delete();
                 Intent i = new Intent(this, LoginActivity.class);
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
@@ -136,28 +138,27 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             //flist = getVisibleFragments();
             boolean flag = false;
             //int first = repository.getMonthCommits().get(0).getTotal();
-            for(int i = 1; i < repository.getMonthCommits().size(); i++)
-            {
-                if (repository.getMonthCommits().get(i).getTotal() > 0){
-                    flag = true;
+            if (repository != null) {
+                for (int i = 1; i < repository.getMonthCommits().size(); i++) {
+                    if (repository.getMonthCommits().get(i).getTotal() > 0) {
+                        flag = true;
+                    }
                 }
             }
-            if (flag){
+            if (flag) {
                 System.out.println("ok");
-                tries=0;
-            }
-            else if(!flag){
+                tries = 0;
+            } else if (!flag) {
                 MainActivity.tries++;
                 System.out.println("TRIES: " + tries);
-                if(MainActivity.tries < 12) {
+                if (MainActivity.tries < 12) {
                     AsyncTaskRunner astr = new AsyncTaskRunner();
                     astr.execute("");
                 }
                 //else
-                    //Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();;
+                //Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();;
                 //return;
             }
-
             if (repository != null) {
 
                 viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);
@@ -168,46 +169,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 createFragments(repository);
                 setupViewPager(viewPager);
                 tabLayout.setupWithViewPager(viewPager);
-
-
-            }/*
-            else if (refreshing && repository != null) {
-                dayFragment.setCurrent(0);
-                dayFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
-                List<Integer> totals = new ArrayList<Integer>();
-                for (DayCommit dayCommit : repository.getDayCommits())
-                    totals.add(dayCommit != null ? dayCommit.getTotal() : 0);
-                dayFragment.setTotals(totals);
-                dayFragment.setData1((ArrayList<Integer>) repository.getDayCommits().get(0).getHours());
-                dayFragment.setData2((ArrayList<Integer>) repository.getDayCommits().get(1).getHours());
-                dayFragment.setData3((ArrayList<Integer>) repository.getDayCommits().get(2).getHours());
-                dayFragment.refreshData();
-
-                weekFragment.setCurrent(0);
-                weekFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
-                List<Integer> totalsw = new ArrayList<Integer>();
-                for (WeekCommit weekCommit : repository.getWeekCommits())
-                    totalsw.add(weekCommit != null ? weekCommit.getTotal() : 0);
-                weekFragment.setTotals(totalsw);
-                weekFragment.setData1((ArrayList<Integer>) repository.getWeekCommits().get(0).getDays());
-                weekFragment.setData2((ArrayList<Integer>) repository.getWeekCommits().get(1).getDays());
-                weekFragment.setData3((ArrayList<Integer>) repository.getWeekCommits().get(2).getDays());
-                weekFragment.refreshData();
-
-                monthFragment.setCurrent(0);
-                monthFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
-                List<Integer> totalsm = new ArrayList<Integer>();
-                for (WeekCommit weekCommit : repository.getWeekCommits())
-                    totalsm.add(weekCommit != null ? weekCommit.getTotal() : 0);
-
-                monthFragment.setTotals(totalsm);
-
-                monthFragment.setData1((ArrayList<Integer>) repository.getMonthCommits().get(0).getDays());
-                monthFragment.setData2((ArrayList<Integer>) repository.getMonthCommits().get(1).getDays());
-                monthFragment.setData3((ArrayList<Integer>) repository.getMonthCommits().get(2).getDays());
-
-                monthFragment.refreshData();
-            }*/
+            } //else Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();
+            //return;
             refreshing = false;
         }
     }
@@ -238,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         if (repository.getDayCommits().size() == 3) {
             bundle.putLong("date", repository.getDayCommits().get(0).getDate() != null ? repository.getDayCommits().get(0).getDate().getTime() : 0);
         } else {
-            bundle.putLong("date",  0);
+            bundle.putLong("date", 0);
         }
         bundle.putInt("type", 0);
         dayFragment.setArguments(bundle);
@@ -304,13 +267,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     }
 
 
-
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
 
-        if(getResources().getBoolean(R.bool.portrait_only)){
+        if (getResources().getBoolean(R.bool.portrait_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
@@ -349,7 +311,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                repository.delete();
+                if (repository != null)
+                    repository.delete();
                 mApp.resetStoredRepoId();
                 repository = null;
                 refreshing = true;

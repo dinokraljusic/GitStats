@@ -52,7 +52,7 @@
 
         <EditText
             android:layout_width="match_parent"
-            android:text="https://github.com/torvalds/linux"
+            android:hint="URL to GitRipper"
             android:id="@+id/url"
             android:background="@android:color/white"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"

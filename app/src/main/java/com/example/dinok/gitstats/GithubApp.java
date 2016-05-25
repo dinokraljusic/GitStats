@@ -186,7 +186,8 @@ public class GithubApp {
                     JSONObject jsonObj = (JSONObject) new JSONTokener(response)
                             .nextValue();
                     repository.fromJson(jsonObj);
-                }
+                } else
+                    repository = null;
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -250,7 +251,7 @@ public class GithubApp {
         String repoUrl = mSession.getRepo();
         if (repoUrl != null && !repoUrl.equals("")) {
             try {
-                String actualRepo ="";
+                String actualRepo = "";
                 if (repoUrl.contains("com/"))
                     actualRepo = repoUrl.substring(repoUrl.indexOf("com/") + 4);
                 else
