@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 mApp.resetAccessToken();
                 repository.delete();
                 Intent i = new Intent(this, LoginActivity.class);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 return true;
 

@@ -315,17 +315,9 @@ public class OneFragment extends Fragment  {
         }
 
 
-       /* if(type == 0)
-             axisX = Axis.generateAxisFromRange(0, 23, 1);
-        else if(type == 1)
-            axisX = Axis.generateAxisFromRange(0, 6, 1);
-        else if(type == 2)
-            axisX = Axis.generateAxisFromRange(0, 30, 1);*/
+
 
         for (int i = 0; i < data.size(); i++) {
-            /*if (i>0 && data.get(i-1) == 0 && data.get(i)==0 && i<data.size()-1)
-                i++;
-            else*/
             if (data.get(i) > 0) values.add(new PointValue(i, data.get(i)));
         }
 
@@ -373,18 +365,16 @@ public class OneFragment extends Fragment  {
             axisX.setName("Days");
         if (type == 2) {
             String m = "";
-            m = (month - 1 - getCurrent() <= 0) ? getResources().getStringArray(R.array.months)[month - 1 - getCurrent() + 12] : getResources().getStringArray(R.array.months)[month - 1 - getCurrent()];
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.DATE, day);
+            calendar.set(Calendar.MONTH, month-current);
+            m = getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)];
             axisX.setName(m);
         }
 
-        //axisY.setName("Axis Y");
-        // }
         lineChartData.setAxisXBottom(axisX);
         lineChartData.setAxisYLeft(axisY);
 
-
-        //LineChartView chart2 = new LineChartView(this);
-        //chart.setLineChartData(data);
         chart.setLineChartData(lineChartData);
     }
 
