@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import android.content.pm.ActivityInfo;
+import android.widget.Toast;
 
 //import android.support.v4.app.FragmentManager;
 
@@ -79,24 +80,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
     }
 
-    private TextView getActionBarTextView() {
-        TextView titleTextView = null;
-
-        try {
-            Field f = getSupportActionBar().getClass().getDeclaredField("mTitleTextView");
-            f.setAccessible(true);
-            titleTextView = (TextView) f.get(getSupportActionBar());
-        } catch (NoSuchFieldException e) {
-        } catch (IllegalAccessException e) {
-        }
-        return titleTextView;
-    }
-
-    // When requested, this adapter returns a DemoObjectFragment,
-    // representing an object in the collection.
-    //DemoCollectionPagerAdapter mDemoCollectionPagerAdapter;
-    ViewPager mViewPager;
-    String repo;
+    /*ViewPager mViewPager;
+    String repo;*/
 
     public void getApiData() {
         repository = mApp.getRepoData();
@@ -127,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             return repository;
         }
 
-        public List<Fragment> getVisibleFragments() {
+       /* public List<Fragment> getVisibleFragments() {
             List<Fragment> allFragments = getSupportFragmentManager().getFragments();
             if (allFragments == null || allFragments.isEmpty()) {
                 return Collections.emptyList();
@@ -141,44 +126,38 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             }
             return visibleFragments;
         }
-        public List<Fragment> flist;
+        public List<Fragment> flist;*/
 
 
         @Override
         protected void onPostExecute(Repository repository) {
             super.onPostExecute(repository);
-            flist = getVisibleFragments();
+            //flist = getVisibleFragments();
             boolean flag = false;
             //int first = repository.getMonthCommits().get(0).getTotal();
             for(int i = 1; i < repository.getMonthCommits().size(); i++)
             {
                 if (repository.getMonthCommits().get(0).getTotal() > 0){
                     flag = true;
-                    //break;
                 }
-
             }
             if (flag){
                 System.out.println("ok");
                 tries=0;
             }
-
-            if(!flag){
+            else if(!flag){
                 MainActivity.tries++;
                 System.out.println("TRIES: " + tries);
-                if(MainActivity.tries > 10) return;
-                AsyncTaskRunner astr = new AsyncTaskRunner();
-                astr.execute("");
+                if(MainActivity.tries < 12) {
+                    AsyncTaskRunner astr = new AsyncTaskRunner();
+                    astr.execute("");
+                }
+                else
+                    Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();;
                 return;
             }
 
             if (repository != null /*&& !refreshing*/) {
-
-                // createFragment(dayFragment, (ArrayList<Integer>) repository.getDayCommits().get(current).getHours(), (repository.getDayCommits().get(current) != null ? repository.getDayCommits().get(current).getTotal() : 0));
-                // createFragment(weekFragment, (ArrayList<Integer>) repository.getWeekCommits().get(current).getDays(), (repository.getWeekCommits().get(current) != null ? repository.getWeekCommits().get(current).getTotal() : 0));
-                //createFragment(monthFragment, (ArrayList<Integer>) repository.getMonthCommits().get(current).getDays(), (repository.getMonthCommits().get(current) != null ? repository.getMonthCommits().get(current).getTotal() : 0));
-
-                //createFragments(repository);
 
                 viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);
 
@@ -190,7 +169,8 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 tabLayout.setupWithViewPager(viewPager);
 
 
-            } else if (refreshing && repository != null) {
+            }
+            else if (refreshing && repository != null) {
                 dayFragment.setCurrent(0);
                 dayFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
                 List<Integer> totals = new ArrayList<Integer>();
@@ -228,7 +208,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 monthFragment.refreshData();
             }
             refreshing = false;
-            //Toast.makeText(PersonList.this, pl.toString(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -321,20 +300,14 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         }
         bundle3.putInt("type", 2);
         monthFragment.setArguments(bundle3);
-
     }
 
 
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //requestWindowFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
 
-        //ActionBar actionBar = getSupportActionBar();
-        // actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appgreen)));
-        //  actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        //   actionBar.setCustomView(R.layout.actionbar);
 
         if(getResources().getBoolean(R.bool.portrait_only)){
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -345,33 +318,21 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         current = 0;
 
-
-        //****http://www.androidhive.info/2015/09/android-material-design-working-with-tabs/*/
         toolbar = (CustomToolBar) findViewById(R.id.toolbar);
-        /*TextView tvTitle = findViewById(R.id.action_ba)
-        ViewPager.LayoutParams layoutParams = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.)
-        tvTitle.setLayoutParams();*/
 
 
         toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appblue)));//boja appbara
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);//ukidamo back button
-        //getSupportActionBar().setCustomView(R.layout.actionbar);
-
-        //getActionBarTextView().setText("AADSF");
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);//
-        //tabLayout.getTabAt(0).setCustomView(R.layout.tab_layout);
 
         tabLayout.setTabTextColors(Color.LTGRAY, Color.parseColor("#007aff"));
         tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#007aff"));
 
-/***/
-        //viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);
-        //setupViewPager(viewPager);//****/
-
+/****/
         AsyncTaskRunner astr = new AsyncTaskRunner();
         astr.execute(" ");
 
@@ -407,19 +368,10 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         adapter.addFragment(monthFragment, "MONTH");
         viewPager.setAdapter(adapter);
 
-        //viewPager.scro
     }
 
     private void resetViewPager(ViewPagerNoSwipe viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        //getSupportFragmentManager().getFragments().removeAll(getSupportFragmentManager().getFragments());
-
-      /*  if(dayFragment != null)
-            getSupportFragmentManager().beginTransaction().remove(dayFragment).commit();
-        if(monthFragment != null)
-            getSupportFragmentManager().beginTransaction().remove(monthFragment).commit();
-        if(monthFragment != null)
-            getSupportFragmentManager().beginTransaction().remove(monthFragment).commit();*/
 
         viewPager.removeAllViews();
         adapter.removeFragment(dayFragment, "DAY");
@@ -430,7 +382,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         monthFragment = null;
         weekFragment = null;
 
-        //viewPager.scro
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
