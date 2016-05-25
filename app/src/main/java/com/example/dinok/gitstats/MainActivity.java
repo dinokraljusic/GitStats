@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             //int first = repository.getMonthCommits().get(0).getTotal();
             for(int i = 1; i < repository.getMonthCommits().size(); i++)
             {
-                if (repository.getMonthCommits().get(0).getTotal() > 0){
+                if (repository.getMonthCommits().get(i).getTotal() > 0){
                     flag = true;
                 }
             }
@@ -153,9 +153,9 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                     AsyncTaskRunner astr = new AsyncTaskRunner();
                     astr.execute("");
                 }
-                else
-                    Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();;
-                return;
+                //else
+                    //Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();;
+                //return;
             }
 
             if (repository != null /*&& !refreshing*/) {
