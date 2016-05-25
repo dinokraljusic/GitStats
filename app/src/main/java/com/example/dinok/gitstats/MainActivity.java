@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 //return;
             }
 
-            if (repository != null /*&& !refreshing*/) {
+            if (repository != null) {
 
                 viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 tabLayout.setupWithViewPager(viewPager);
 
 
-            }
+            }/*
             else if (refreshing && repository != null) {
                 dayFragment.setCurrent(0);
                 dayFragment.refreshFromApi(repository.getDescription(), repository.getReadme());
@@ -203,11 +203,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 monthFragment.setTotals(totalsm);
 
                 monthFragment.setData1((ArrayList<Integer>) repository.getMonthCommits().get(0).getDays());
-                monthFragment.setData1((ArrayList<Integer>) repository.getWeekCommits().get(1).getDays());
-                monthFragment.setData1((ArrayList<Integer>) repository.getWeekCommits().get(2).getDays());
+                monthFragment.setData2((ArrayList<Integer>) repository.getMonthCommits().get(1).getDays());
+                monthFragment.setData3((ArrayList<Integer>) repository.getMonthCommits().get(2).getDays());
 
                 monthFragment.refreshData();
-            }
+            }*/
             refreshing = false;
         }
     }
