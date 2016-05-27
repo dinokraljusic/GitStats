@@ -148,7 +148,7 @@ public class OneFragment extends Fragment  {
         progressBar = (ProgressBar) view.findViewById(R.id.progress);
         //int max = Math.max(totals.get(0), totals.get(1));
         //if(max < )
-        if(getTotals() != null) {
+        if(getTotals() != null && getTotals().size() >0) {
             int max = Collections.max(getTotals());
             double d = Double.parseDouble(getTotals() != null && getTotals().size() > 0 && getTotals().get(getCurrent()) != null ? getTotals().get(getCurrent()).toString() : "0") * 100;
             Double p = d / max;
