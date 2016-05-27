@@ -15,6 +15,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.Window;
+import android.view.WindowManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -243,6 +246,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
+        /*Window window = this.getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(getBaseContext().getResources().getColor(R.color.appblue));*/
+
 
         mApp = new GithubApp(this, Constants.CLIENT_ID, Constants.CLIENT_SECRET, Constants.CALLBACK_URL);
 
@@ -268,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(this);
-        swipeLayout.setDistanceToTriggerSync(100);
+        swipeLayout.setDistanceToTriggerSync(180);
 
     }
 
@@ -287,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 astr.execute(" ");
                 swipeLayout.setRefreshing(false);
             }
-        }, 1000);
+        }, 700);
     }
 
 
@@ -304,14 +312,17 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private void resetViewPager(ViewPagerNoSwipe viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        viewPager.removeAllViews();
-        adapter.removeFragment(dayFragment, "DAY");
-        adapter.removeFragment(weekFragment, "WEEK");
-        adapter.removeFragment(monthFragment, "MONTH");
-        viewPager.setAdapter(adapter);
-        dayFragment = null;
-        monthFragment = null;
-        weekFragment = null;
+        //viewPager.removeAllViews();
+        //viewPager.notify();
+        //viewPager.notifyAll();
+        adapter.notifyDataSetChanged();
+        //adapter.removeFragment(dayFragment, "DAY");
+       // adapter.removeFragment(weekFragment, "WEEK");
+       // adapter.removeFragment(monthFragment, "MONTH");
+        //viewPager.setAdapter(adapter);
+        //dayFragment = null;
+        //monthFragment = null;
+        //weekFragment = null;
 
     }
 

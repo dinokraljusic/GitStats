@@ -22,12 +22,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
+import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
@@ -146,10 +148,12 @@ public class OneFragment extends Fragment  {
         progressBar = (ProgressBar) view.findViewById(R.id.progress);
         //int max = Math.max(totals.get(0), totals.get(1));
         //if(max < )
-        int max = Collections.max(getTotals());
-        double d = Double.parseDouble(getTotals() != null && getTotals().size() > 0 && getTotals().get(getCurrent()) != null ? getTotals().get(getCurrent()).toString() : "0") * 100;
-        Double p = d / max;
-        progressBar.setProgress(p.intValue());
+        if(getTotals() != null) {
+            int max = Collections.max(getTotals());
+            double d = Double.parseDouble(getTotals() != null && getTotals().size() > 0 && getTotals().get(getCurrent()) != null ? getTotals().get(getCurrent()).toString() : "0") * 100;
+            Double p = d / max;
+            progressBar.setProgress(p.intValue());
+        }
 
         tvDate = (TextView) view.findViewById(R.id.date);
         setDate();
@@ -306,8 +310,6 @@ public class OneFragment extends Fragment  {
         }
 
 
-
-
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i) > 0) values.add(new PointValue(i, data.get(i)));
         }
@@ -321,15 +323,29 @@ public class OneFragment extends Fragment  {
         }
 
         chart.setInteractive(false);
+        Axis axisY = new Axis().setHasLines(true);
 
         String color = "";
-        if (type == 0)
+        if (type == 0) {
             color = "#007aff";
-        if (type == 1)
+            axisX.setName("Hours");
+        }
+        if (type == 1){
             color = "#00C951";
-        if (type == 2)
+            List<Float> axisValues =  Arrays.asList(0.f, 1.f, 2.f, 3.f, 4.f, 5.f, 6.f);
+            List<String> axisValueLabels =  Arrays.asList("S", "M", "T", "W", "T", "F", "S");
+            axisX = Axis.generateAxisFromCollection(axisValues,axisValueLabels);
+            axisX.setName("Days");
+        }
+        if (type == 2){
             color = "#FFCC33";
-        Line line = new Line(values).setColor(Color.parseColor(color)).setCubic(false).setFilled(true).setAreaTransparency(15);//.setHasLabels(true);//Color.BLUE
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.DATE, day);
+            calendar.set(Calendar.MONTH, month-current);
+            axisX.setName(getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)]);
+        }
+
+        Line line = new Line(values).setColor(Color.parseColor(color)).setCubic(false).setFilled(true).setAreaTransparency(15).setCubic(false);//.setHasLabels(true);//Color.BLUE
 
         List<Line> lines = new ArrayList<Line>();
         lines.add(line);
@@ -337,29 +353,13 @@ public class OneFragment extends Fragment  {
         LineChartData lineChartData = new LineChartData();
         lineChartData.setLines(lines);
         lineChartData.setBaseValue(Float.NEGATIVE_INFINITY);
-        //Axis axisX = new Axis();
-        Axis axisY = new Axis().setHasLines(true);
-        // Axis axisX = Axis.generateAxisFromRange(0, data.size(), 1);
-        //Axis axisY = Axis.generateAxisFromCollection(valuesY).setHasLines(true);
-        //if (hasAxesNames) {
-        if (type == 0)
-            axisX.setName("Hours");
-        if (type == 1)
-            axisX.setName("Days");
-        if (type == 2) {
-            String m = "";
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.DATE, day);
-            calendar.set(Calendar.MONTH, month-current);
-            m = getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)];
-            axisX.setName(m);
-        }
 
         lineChartData.setAxisXBottom(axisX);
         lineChartData.setAxisYLeft(axisY);
 
         chart.setLineChartData(lineChartData);
     }
+
 
     public Integer getCurrent() {
         return current;
