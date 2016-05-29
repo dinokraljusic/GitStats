@@ -8,7 +8,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -60,10 +59,8 @@ public class GithubApp {
         mSession = new GithubSession(context);
         mAccessToken = mSession.getAccessToken();
         mCallbackUrl = callbackUrl;
-        mTokenUrl = TOKEN_URL + "client_id=" + clientId + "&client_secret="
-                + clientSecret + "&redirect_uri=" + mCallbackUrl;
-        mAuthUrl = AUTH_URL + "client_id=" + clientId + "&redirect_uri="
-                + mCallbackUrl + "&scope=" + Constants.SCOPE /*+ "&username=" + "vk15248" + "&password=" + "1812sKapi"*/;
+        mTokenUrl = TOKEN_URL + "client_id=" + clientId + "&client_secret=" + clientSecret + "&redirect_uri=" + mCallbackUrl;
+        mAuthUrl = AUTH_URL + "client_id=" + clientId + "&redirect_uri=" + mCallbackUrl + "&scope=" + Constants.SCOPE;
 
         GithubDialog.OAuthDialogListener listener = new GithubDialog.OAuthDialogListener() {
             @Override
@@ -135,12 +132,6 @@ public class GithubApp {
                     Log.d(TAG, "Opening URL " + url.toString());
                     HttpURLConnection urlConnection = (HttpURLConnection) url
                             .openConnection();
-                   /* urlConnection.setRequestMethod("GET");
-                    urlConnection.setDoInput(true);
-                    urlConnection.setDoOutput(true);
-                    urlConnection.setRequestProperty("User-Agent", "Git-Stats");
-                    urlConnection.setRequestProperty("Content-Type", "application/json");
-                    urlConnection.setRequestProperty("Accept", "application/json");*/
                     urlConnection.connect();
                     String response = streamToString(urlConnection
                             .getInputStream());
@@ -169,17 +160,10 @@ public class GithubApp {
             try {
                 String actualRepo = repoUrl.substring(repoUrl.indexOf("com/") + 4);
                 URL url = new URL(API_URL + "/repos/" + actualRepo + "?access_token=" + mAccessToken);
-                //  URL url = new URL("https://api.github.com/repos/vk15248/Memory?access_token=" + mAccessToken);
 
                 Log.d(TAG, "Opening URL " + url.toString());
                 HttpURLConnection urlConnection = (HttpURLConnection) url
                         .openConnection();
-                       /* urlConnection.setRequestMethod("GET");
-                        String authString = Base64.encodeToString(("OAuth2 " + mAccessToken).getBytes(), Base64.DEFAULT);
-                        //urlConnection.setRequestProperty("Authorization", "token " + mAccessToken);
-                        urlConnection.setRequestProperty("User-Agent", "Git-Stats");
-                        urlConnection.setDoInput(true);
-                        urlConnection.setDoOutput(true);*/
                 urlConnection.connect();
                 if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     String response = streamToString(urlConnection.getInputStream());

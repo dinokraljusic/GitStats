@@ -33,9 +33,9 @@ import lecho.lib.hellocharts.view.LineChartView;
 
 public class OneFragment extends Fragment {
 
-    private Integer current = 0;
-    private Repository repository;
-    private Type type;
+    Integer current = 0;
+    Repository repository;
+    Type type;
 
     TextView tvTodayTotal;
     TextView tvTotaltext;
@@ -83,22 +83,18 @@ public class OneFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (getType() == Type.DAY) {
-            //tvTotaltext.setText("Today total");
-            //progressBar.getProgressDrawable().setColorFilter(Color.BLUE, PorterDuff.Mode.DST_IN);
             MainActivity.toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appblue)));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.appblue)));
             MainActivity.tabLayout.setTabTextColors(Color.LTGRAY, Color.parseColor("#007aff"));
             MainActivity.tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#007aff"));
-        } else if (getType() == Type.WEEK) {
-            //tvTotaltext.setText("Week total");
-            //progressBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.DST_IN);
+        }
+        else if (getType() == Type.WEEK) {
             MainActivity.toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appgreen)));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.appgreen)));
             MainActivity.tabLayout.setTabTextColors(Color.LTGRAY, Color.parseColor("#00C951"));
             MainActivity.tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#00C951"));
-        } else if (getType() == Type.MONTH) {
-            //tvTotaltext.setText("Month total");
-            //progressBar.getProgressDrawable().setColorFilter(Color.YELLOW, PorterDuff.Mode.DST_IN);
+        }
+        else if (getType() == Type.MONTH) {
             MainActivity.toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.apporange)));
             progressBar.setProgressTintList(ColorStateList.valueOf(getResources().getColor(R.color.apporange)));
             MainActivity.tabLayout.setTabTextColors(Color.LTGRAY, Color.parseColor("#FFCC33"));
@@ -116,7 +112,10 @@ public class OneFragment extends Fragment {
             if (getTotals() != null && getTotals().size() > 0) {
                 int max = Collections.max(getTotals());
                 double d = Double.parseDouble(getTotals() != null && getTotals().size() > 0 && getTotals().get(getCurrent()) != null ? getTotals().get(getCurrent()).toString() : "0") * 100;
-                Double p = d / max;
+                Double p;
+                if(max!=0)
+                    p = d / max;
+                else p=d;
                 progressBar.setProgress(p.intValue());
             }
 
@@ -277,15 +276,12 @@ public class OneFragment extends Fragment {
         calendar.set(Calendar.MONTH, month);
         switch (getType()) {
             case DAY:
-                //calendar.add(Calendar.DATE, -getCurrent());
                 tvDate.setText(calendar.get(Calendar.DATE) + " " + getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)]);
                 break;
             case WEEK:
-                //calendar.add(Calendar.DATE, -getCurrent() * 7);
                 tvDate.setText(calendar.get(Calendar.DATE) + " " + getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)]);
                 break;
             case MONTH:
-               //calendar.add(Calendar.MONTH, -getCurrent());
                 tvDate.setText(/*alendar.get(Calendar.DATE) + " " +*/getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)] + " " + calendar.get(Calendar.YEAR));
                 break;
         }
