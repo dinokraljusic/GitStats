@@ -37,32 +37,12 @@ public class OneFragment extends Fragment {
     Repository repository;
     Type type;
 
-    TextView tvTodayTotal;
-    TextView tvTotaltext;
-    TextView tvFullName;
+    TextView tvTodayTotal, tvTotaltext, tvFullName, tvDate, tvDescription, tvReadme;
+
     LineChartView chart;
 
     ProgressBar progressBar;
     View view;
-    TextView tvDate;
-    TextView tvDescription;
-    TextView tvReadme;
-
-    public Repository getRepository() {
-        return repository;
-    }
-
-    public void setRepository(Repository repository) {
-        this.repository = repository;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
-    }
 
     public enum Type {
         DAY(0),
@@ -76,6 +56,27 @@ public class OneFragment extends Fragment {
         }
     }
 
+    public Repository getRepository() {
+        return repository;
+    }
+
+    public void setRepository(Repository repository) {
+        this.repository = repository;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) { this.type = type; }
+
+    public Integer getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(Integer current) {
+        this.current = current;
+    }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
@@ -267,7 +268,6 @@ public class OneFragment extends Fragment {
         });
 
         return view;
-
     }
 
     public void setDate(int day, int month) {
@@ -282,7 +282,7 @@ public class OneFragment extends Fragment {
                 tvDate.setText(calendar.get(Calendar.DATE) + " " + getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)]);
                 break;
             case MONTH:
-                tvDate.setText(/*alendar.get(Calendar.DATE) + " " +*/getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)] + " " + calendar.get(Calendar.YEAR));
+                tvDate.setText(/*calendar.get(Calendar.DATE) + " " +*/getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)] + " " + calendar.get(Calendar.YEAR));
                 break;
         }
     }
@@ -309,13 +309,11 @@ public class OneFragment extends Fragment {
             values.add(new PointValue(prvi - 1, 0));
         }
 
-
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i) > 0) values.add(new PointValue(i, data.get(i)));
             if(prvi >= 0 && i > prvi && i < zadnji && data.get(i) == 0 && data.get(i-1)!=0) values.add(new PointValue(i, 0));
             if(i < zadnji && data.get(i) == 0 && data.get(i+1)!=0) values.add(new PointValue(i, 0));
         }
-
 
         /**
          dodavanje redoslijedom:
@@ -328,7 +326,7 @@ public class OneFragment extends Fragment {
         chart.setInteractive(false);
         Axis axisY = new Axis().setHasLines(true);
 
-        String color = "";
+        String color = "#007aff";
         if (getType() == Type.DAY) {
             color = "#007aff";
             List<Float> axisValues = Arrays.asList(0.f, 3.f, 6.f, 9.f, 12.f, 15.f, 18.f, 21.f, 23.f);
@@ -364,14 +362,5 @@ public class OneFragment extends Fragment {
         lineChartData.setAxisYLeft(axisY);
 
         chart.setLineChartData(lineChartData);
-    }
-
-
-    public Integer getCurrent() {
-        return current;
-    }
-
-    public void setCurrent(Integer current) {
-        this.current = current;
     }
 }

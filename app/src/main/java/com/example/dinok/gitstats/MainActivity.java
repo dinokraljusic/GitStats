@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
     private Repository repository;
     private Integer current;
 
-    //*****/
     public static CustomToolBar toolbar;
     public static TabLayout tabLayout;
     private ViewPagerNoSwipe viewPager;
@@ -59,14 +58,11 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    /*ViewPager mViewPager;
-    String repo;*/
 
     public void getApiData() {
         setRepository(mApp.getRepoData());
@@ -102,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
 
             if (getRepository() == null)
                 getApiData();
-            while (getRepository() != null && getRepository().getDayCommits().size() == 0)
+            while (getRepository() != null && getRepository().getDayCommits().size() == 0)//it happens that a valid request  returns empty JSON object the first time
                 getApiData();
             return getRepository();
         }
@@ -111,22 +107,24 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         @Override
         protected void onPostExecute(Repository repository) {
             super.onPostExecute(repository);
-            if (repository != null && !refreshing) {
 
+            if (repository != null && !refreshing) {
                 viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);
                 if (getSupportFragmentManager().getFragments() == null) {
                     createFragments(repository);
                     setupViewPager(viewPager);
-                } else {
+                }
+                else {
                     refreshExisting();
                     replaceViewPager(viewPager);
                 }
                 tabLayout.setupWithViewPager(viewPager);
-            } else if (repository != null && refreshing) {
+            }
+            else if (repository != null && refreshing) {
                 refreshExisting();
-            } else
+            }
+            else
                 Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();
-            //return;
             refreshing = false;
         }
     }
@@ -167,23 +165,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         if (getResources().getBoolean(R.bool.portrait_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-
 
         mApp = new GithubApp(this, Constants.CLIENT_ID, Constants.CLIENT_SECRET, Constants.CALLBACK_URL);
 
         current = 0;
 
         toolbar = (CustomToolBar) findViewById(R.id.toolbar);
-
-
         toolbar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.appblue)));//boja appbara
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);//ukidamo back button
+
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);//
@@ -191,23 +185,12 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         tabLayout.setTabTextColors(Color.LTGRAY, Color.parseColor("#007aff"));
         tabLayout.setSelectedTabIndicatorColor(Color.parseColor("#007aff"));
 
-/****/
         AsyncTaskRunner astr = new AsyncTaskRunner();
         astr.execute(" ");
 
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_container);
         swipeLayout.setOnRefreshListener(this);
         swipeLayout.setDistanceToTriggerSync(180);
-
-
-        /*if (savedInstanceState == null) {
-            OneFragment test = new TestFragment();
-            test.setArguments(getIntent().getExtras());
-            getSupportFragmentManager().beginTransaction().replace(android.R.id.content, test, "your_fragment_tag").commit();
-        } else {
-            TestFragment test = (TestFragment) getSupportFragmentManager().findFragmentByTag("your_fragment_tag");
-        }*/
-
 
     }
 
@@ -306,6 +289,4 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             return mFragmentTitleList.get(position);
         }
     }
-
-
 }

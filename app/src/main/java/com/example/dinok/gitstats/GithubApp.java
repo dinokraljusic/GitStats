@@ -54,8 +54,7 @@ public class GithubApp {
 
     private static final String TAG = "GitHubAPI";
 
-    public GithubApp(Context context, String clientId, String clientSecret,
-                     String callbackUrl) {
+    public GithubApp(Context context, String clientId, String clientSecret, String callbackUrl) {
         mSession = new GithubSession(context);
         mAccessToken = mSession.getAccessToken();
         mCallbackUrl = callbackUrl;
@@ -92,25 +91,21 @@ public class GithubApp {
                 try {
                     URL url = new URL(mTokenUrl + "&code=" + code);
                     Log.i(TAG, "Opening URL " + url.toString());
-                    HttpURLConnection urlConnection = (HttpURLConnection) url
-                            .openConnection();
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                     urlConnection.setRequestMethod("GET");
                     urlConnection.setDoInput(true);
                     urlConnection.setDoOutput(true);
                     urlConnection.connect();
-                    String response = streamToString(urlConnection
-                            .getInputStream());
+                    String response = streamToString(urlConnection.getInputStream());
+
                     Log.i(TAG, "response " + response);
-                    mAccessToken = response.substring(
-                            response.indexOf("access_token=") + 13,
-                            response.indexOf("&scope"));
+                    mAccessToken = response.substring(response.indexOf("access_token=") + 13, response.indexOf("&scope"));
                     Log.i(TAG, "Got access token: " + mAccessToken);
                     mSession.storeAccessToken(mAccessToken, "", "", mRepo);
                 } catch (Exception ex) {
                     what = 1;
                     ex.printStackTrace();
                 }
-
                 mHandler.sendMessage(mHandler.obtainMessage(what, 1, 0));
             }
         }.start();
@@ -126,19 +121,15 @@ public class GithubApp {
                 int what = 0;
 
                 try {
-                    URL url = new URL(API_URL + "/user?access_token="
-                            + mAccessToken);
+                    URL url = new URL(API_URL + "/user?access_token=" + mAccessToken);
 
                     Log.d(TAG, "Opening URL " + url.toString());
-                    HttpURLConnection urlConnection = (HttpURLConnection) url
-                            .openConnection();
+                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                     urlConnection.connect();
-                    String response = streamToString(urlConnection
-                            .getInputStream());
+                    String response = streamToString(urlConnection.getInputStream());
+                    //System.out.println(response);
 
-                    System.out.println(response);
-                    JSONObject jsonObj = (JSONObject) new JSONTokener(response)
-                            .nextValue();
+                    JSONObject jsonObj = (JSONObject) new JSONTokener(response).nextValue();
                     String id = jsonObj.getString("id");
                     String login = jsonObj.getString("login");
                     Log.i(TAG, "Got user name: " + login);
@@ -147,7 +138,6 @@ public class GithubApp {
                     what = 1;
                     ex.printStackTrace();
                 }
-
                 mHandler.sendMessage(mHandler.obtainMessage(what, 2, 0));
             }
         }.start();
@@ -162,13 +152,12 @@ public class GithubApp {
                 URL url = new URL(API_URL + "/repos/" + actualRepo + "?access_token=" + mAccessToken);
 
                 Log.d(TAG, "Opening URL " + url.toString());
-                HttpURLConnection urlConnection = (HttpURLConnection) url
-                        .openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.connect();
+
                 if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     String response = streamToString(urlConnection.getInputStream());
-                    JSONObject jsonObj = (JSONObject) new JSONTokener(response)
-                            .nextValue();
+                    JSONObject jsonObj = (JSONObject) new JSONTokener(response).nextValue();
                     repository.fromJson(jsonObj);
                 } else
                     repository = null;
@@ -188,17 +177,15 @@ public class GithubApp {
                 URL url = new URL(API_URL + "/repos/" + actualRepo + "/readme" + "?access_token=" + mAccessToken);
 
                 Log.d(TAG, "Opening URL " + url.toString());
-                HttpURLConnection urlConnection = (HttpURLConnection) url
-                        .openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.connect();
                 if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     String response = streamToString(urlConnection.getInputStream());
-                    JSONObject jsonObj = (JSONObject) new JSONTokener(response)
-                            .nextValue();
+                    JSONObject jsonObj = (JSONObject) new JSONTokener(response).nextValue();
                     URL downloadUrl = new URL(jsonObj.getString("download_url"));
-                    HttpURLConnection downloadUrlConnection = (HttpURLConnection) downloadUrl
-                            .openConnection();
+                    HttpURLConnection downloadUrlConnection = (HttpURLConnection) downloadUrl.openConnection();
                     downloadUrlConnection.connect();
+
                     if (downloadUrlConnection.getResponseCode() == HttpURLConnection.HTTP_OK)
                         repo.setReadme(streamToString(downloadUrlConnection.getInputStream()));
                 }
@@ -216,13 +203,11 @@ public class GithubApp {
                 URL url = new URL(API_URL + "/repos/" + actualRepo + "/stats/commit_activity" + "?access_token=" + mAccessToken);
 
                 Log.d(TAG, "Opening URL " + url.toString());
-                HttpURLConnection urlConnection = (HttpURLConnection) url
-                        .openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.connect();
                 if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     String response = streamToString(urlConnection.getInputStream());
-                    JSONArray jsonArray = (JSONArray) new JSONTokener(response)
-                            .nextValue();
+                    JSONArray jsonArray = (JSONArray) new JSONTokener(response).nextValue();
                     repo.setTotals(jsonArray);
                 }
             } catch (Exception ex) {
@@ -251,17 +236,14 @@ public class GithubApp {
                 calendar.set(Calendar.HOUR_OF_DAY, 0);
                 String sinceAsIso = df.format(calendar.getTime());
 
-
                 URL url = new URL(API_URL + "/repos/" + actualRepo + "/commits" + "?access_token=" + mAccessToken + "&since=" + sinceAsIso + "&until=" + nowAsISO);
 
                 Log.d(TAG, "Opening URL " + url.toString());
-                HttpURLConnection urlConnection = (HttpURLConnection) url
-                        .openConnection();
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.connect();
                 if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     String response = streamToString(urlConnection.getInputStream());
-                    JSONArray jsonArray = (JSONArray) new JSONTokener(response)
-                            .nextValue();
+                    JSONArray jsonArray = (JSONArray) new JSONTokener(response).nextValue();
                     repo.setGraphData(jsonArray);
                 }
             } catch (Exception ex) {
@@ -311,8 +293,7 @@ public class GithubApp {
             String line;
 
             try {
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(is));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
                 while ((line = reader.readLine()) != null) {
                     sb.append(line);
@@ -343,7 +324,6 @@ public class GithubApp {
     public Long getInternalRepoId() {
         return mSession.getRepoInternalId();
     }
-
 
     public String getRepo() {
         return mRepo;
