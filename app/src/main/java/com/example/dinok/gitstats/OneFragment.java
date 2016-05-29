@@ -312,7 +312,10 @@ public class OneFragment extends Fragment {
 
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i) > 0) values.add(new PointValue(i, data.get(i)));
+            if(prvi >= 0 && i > prvi && i < zadnji && data.get(i) == 0 && data.get(i-1)!=0) values.add(new PointValue(i, 0));
+            if(i < zadnji && data.get(i) == 0 && data.get(i+1)!=0) values.add(new PointValue(i, 0));
         }
+
 
         /**
          dodavanje redoslijedom:
@@ -348,7 +351,7 @@ public class OneFragment extends Fragment {
             axisX.setName(getResources().getStringArray(R.array.months)[calendar.get(Calendar.MONTH)]);
         }
 
-        Line line = new Line(values).setColor(Color.parseColor(color)).setCubic(false).setFilled(true).setAreaTransparency(15).setCubic(false);//.setHasLabels(true);//Color.BLUE
+        Line line = new Line(values).setColor(Color.parseColor(color)).setCubic(false).setFilled(true).setAreaTransparency(25).setCubic(false);//.setHasLabels(true);//Color.BLUE
 
         List<Line> lines = new ArrayList<Line>();
         lines.add(line);

@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
-
 public class MainActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener {
     private GithubApp mApp;
     private Repository repository;
@@ -116,26 +114,38 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             if (repository != null && !refreshing) {
 
                 viewPager = (ViewPagerNoSwipe) findViewById(R.id.viewpager);
-                createFragments(repository);
-                setupViewPager(viewPager);
+                if (getSupportFragmentManager().getFragments() == null) {
+                    createFragments(repository);
+                    setupViewPager(viewPager);
+                } else {
+                    refreshExisting();
+                    replaceViewPager(viewPager);
+                }
                 tabLayout.setupWithViewPager(viewPager);
             } else if (repository != null && refreshing) {
-                dayFragment = (OneFragment) getSupportFragmentManager().getFragments().get(0);
-                dayFragment.setRepository(repository);
-                dayFragment.fillData();
-
-                weekFragment = (OneFragment) getSupportFragmentManager().getFragments().get(1);
-                weekFragment.setRepository(repository);
-                weekFragment.fillData();
-
-                monthFragment = (OneFragment) getSupportFragmentManager().getFragments().get(2);
-                monthFragment.setRepository(repository);
-                monthFragment.fillData();
+                refreshExisting();
             } else
                 Toast.makeText(MainActivity.this, "Fetching failed, try again!", Toast.LENGTH_SHORT).show();
             //return;
             refreshing = false;
         }
+    }
+
+    public void refreshExisting() {
+        dayFragment = (OneFragment) getSupportFragmentManager().getFragments().get(0);
+        dayFragment.setRepository(repository);
+        dayFragment.setType(OneFragment.Type.DAY);
+        dayFragment.fillData();
+
+        weekFragment = (OneFragment) getSupportFragmentManager().getFragments().get(1);
+        weekFragment.setRepository(repository);
+        weekFragment.setType(OneFragment.Type.WEEK);
+        weekFragment.fillData();
+
+        monthFragment = (OneFragment) getSupportFragmentManager().getFragments().get(2);
+        monthFragment.setRepository(repository);
+        monthFragment.setType(OneFragment.Type.MONTH);
+        monthFragment.fillData();
     }
 
     public void createFragments(Repository repository) {
@@ -189,6 +199,16 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         swipeLayout.setOnRefreshListener(this);
         swipeLayout.setDistanceToTriggerSync(180);
 
+
+        /*if (savedInstanceState == null) {
+            OneFragment test = new TestFragment();
+            test.setArguments(getIntent().getExtras());
+            getSupportFragmentManager().beginTransaction().replace(android.R.id.content, test, "your_fragment_tag").commit();
+        } else {
+            TestFragment test = (TestFragment) getSupportFragmentManager().findFragmentByTag("your_fragment_tag");
+        }*/
+
+
     }
 
     @Override
@@ -207,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
                 astr.execute(" ");
                 swipeLayout.setRefreshing(false);
             }
-        },1000);
+        }, 1000);
     }
 
 
@@ -217,6 +237,28 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
         adapter.addFragment(dayFragment, "DAY");
         adapter.addFragment(weekFragment, "WEEK");
         adapter.addFragment(monthFragment, "MONTH");
+        viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(3);
+    }
+
+    private void resetViewPager(ViewPagerNoSwipe viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        viewPager.removeAllViews();
+        adapter.removeFragment(dayFragment, "DAY");
+        adapter.removeFragment(weekFragment, "WEEK");
+        adapter.removeFragment(monthFragment, "MONTH");
+        viewPager.setAdapter(adapter);
+        dayFragment = null;
+        monthFragment = null;
+        weekFragment = null;
+    }
+
+    private void replaceViewPager(ViewPagerNoSwipe viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.replaceFramgent(getSupportFragmentManager().getFragments().get(0), "DAY");
+        adapter.replaceFramgent(getSupportFragmentManager().getFragments().get(1), "WEEK");
+        adapter.replaceFramgent(getSupportFragmentManager().getFragments().get(2), "MONTH");
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(3);
     }
@@ -245,6 +287,19 @@ public class MainActivity extends AppCompatActivity implements SwipeRefreshLayou
             getSupportFragmentManager().beginTransaction().attach(fragment).commit();
         }
 
+        public void removeFragment(Fragment fragment, String title) {
+            mFragmentList.remove(fragment);
+            mFragmentTitleList.remove(title);
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
+
+        public void replaceFramgent(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+            getSupportFragmentManager().beginTransaction().detach(fragment).commit();
+            getSupportFragmentManager().beginTransaction().attach(fragment).commit();
+           // getSupportFragmentManager().beginTransaction().replace(R.id.viewpager, fragment, fragment.getTag()).commit();
+        }
 
         @Override
         public CharSequence getPageTitle(int position) {
