@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
         mApp = new GithubApp(this, Constants.CLIENT_ID, Constants.CLIENT_SECRET, Constants.CALLBACK_URL);
-        if ( mApp.hasAccessToken() /*&& mApp.getRepo()!=null*/){
+        if ( mApp.hasAccessToken()){
             goToMain();
             finish();
         }
@@ -54,10 +54,8 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         public void onSuccess() {
-            /*if(mApp.getRepo()!=null )*/ goToMain();
+             goToMain();
             finish();
-            //else
-                //Toast.makeText(LoginActivity.this, "The selected repo does not exist", Toast.LENGTH_SHORT).show();
         }
 
         @Override
